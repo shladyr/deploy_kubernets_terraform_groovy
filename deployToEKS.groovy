@@ -76,12 +76,12 @@ def call(String action,
             dir("${terraformDir}/") {
                 // terragrunt init
                 // AWS_PROFILE - we pull secrets from this profile
-                sh "AWS_PROFILE=${coreAwsProfile["prod"]} CORE_AWS_PROFILE=${coreAwsProfile[coreEnvName]} K8S_AWS_PROFILE=${k8sAwsProfile[k8sEnvName]} BUILD_TAG=${buildTag} ${extraArgs} summon -f ${WORKSPACE}/.quake/secrets/${coreEnvName}.yml -p summon-aws-secrets terragrunt run-all init --terragrunt-non-interactive"
+                sh "AWS_PROFILE=${coreAwsProfile["prod"]} CORE_AWS_PROFILE=${coreAwsProfile[coreEnvName]} K8S_AWS_PROFILE=${k8sAwsProfile[k8sEnvName]} BUILD_TAG=${buildTag} ${extraArgs} summon -f ${WORKSPACE}/secrets/${coreEnvName}.yml -p summon-aws-secrets terragrunt run-all init --terragrunt-non-interactive"
 
                 if (terragruntActions == "up") {
 
                     // terragrunt plan
-                    response = sh(script: "AWS_PROFILE=${coreAwsProfile["prod"]} CORE_AWS_PROFILE=${coreAwsProfile[coreEnvName]} K8S_AWS_PROFILE=${k8sAwsProfile[k8sEnvName]} BUILD_TAG=${buildTag} ${extraArgs} summon -f ${WORKSPACE}/.quake/secrets/${coreEnvName}.yml -p summon-aws-secrets terragrunt run-all plan --terragrunt-non-interactive | tee plan.out", returnStatus: true)
+                    response = sh(script: "AWS_PROFILE=${coreAwsProfile["prod"]} CORE_AWS_PROFILE=${coreAwsProfile[coreEnvName]} K8S_AWS_PROFILE=${k8sAwsProfile[k8sEnvName]} BUILD_TAG=${buildTag} ${extraArgs} summon -f ${WORKSPACE}/secrets/${coreEnvName}.yml -p summon-aws-secrets terragrunt run-all plan --terragrunt-non-interactive | tee plan.out", returnStatus: true)
                     println(response)
 
                     // If deploy authorization is enabled, check if the resources are undergoing a redeploy from the plan output.
@@ -97,7 +97,7 @@ def call(String action,
                     }
 
                     // terragrunt apply
-                    sh "AWS_PROFILE=${coreAwsProfile["prod"]} CORE_AWS_PROFILE=${coreAwsProfile[coreEnvName]} K8S_AWS_PROFILE=${k8sAwsProfile[k8sEnvName]} BUILD_TAG=${buildTag} ${extraArgs} summon -f ${WORKSPACE}/.quake/secrets/${coreEnvName}.yml -p summon-aws-secrets terragrunt run-all apply --terragrunt-non-interactive -auto-approve"
+                    sh "AWS_PROFILE=${coreAwsProfile["prod"]} CORE_AWS_PROFILE=${coreAwsProfile[coreEnvName]} K8S_AWS_PROFILE=${k8sAwsProfile[k8sEnvName]} BUILD_TAG=${buildTag} ${extraArgs} summon -f ${WORKSPACE}/secrets/${coreEnvName}.yml -p summon-aws-secrets terragrunt run-all apply --terragrunt-non-interactive -auto-approve"
                 
                     // if there was anything to add/change/destroy then no need to restart pods
                     terraformChanges = sh(script: "grep -e 'to change' -e 'to add' -e 'to destroy' plan.out", returnStatus: true)
